@@ -1,0 +1,37 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+out/
+
+# Rider / ReSharper
+.idea/
+*.sln.iml
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# User-specific config / secrets
+appsettings.*.local.json
+*.env
+.env
+
+# Logs (Serilog file sink)
+logs/
+
+# NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+# Test results
+[Tt]est[Rr]esult*/
+*.trx
+
+# macOS / OS junk
+.DS_Store
+Thumbs.db
