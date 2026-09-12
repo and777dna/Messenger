@@ -1,6 +1,6 @@
 namespace Messenger.Entities;
 
-public class Messages
+public class Message
 {
     public Guid Id{get; private set;}
     public DateOnly RegistrationDate { get; private set; }
