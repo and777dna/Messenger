@@ -1,0 +1,59 @@
+using Messenger.Data;
+using Messenger.Entities;
+using Messenger.Middleware;
+using Messenger.Repositories.Implementations;
+using Messenger.Repositories.Interfaces;
+using Messenger.Services.Implementations;
+using Messenger.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var connectionString = builder.Configuration.GetConnectionString("MessengerDatabase");
+builder.Services.AddDbContext<MessengerDbContext>(options =>
+    {
+        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+
+        if (builder.Environment.IsDevelopment())
+        {
+            options.LogTo(
+                msg =>
+                {
+                    var lines = msg.Split(Environment.NewLine);
+
+                    var sqlLines = lines
+                        .SkipWhile(l =>
+                            !l.TrimStart().StartsWith("SELECT", StringComparison.OrdinalIgnoreCase) &&
+                            !l.TrimStart().StartsWith("INSERT", StringComparison.OrdinalIgnoreCase) &&
+                            !l.TrimStart().StartsWith("UPDATE", StringComparison.OrdinalIgnoreCase) &&
+                            !l.TrimStart().StartsWith("DELETE", StringComparison.OrdinalIgnoreCase));
+
+                    var sql = string.Join(Environment.NewLine, sqlLines);
+
+                    if (!string.IsNullOrWhiteSpace(sql))
+                    {
+                        Console.WriteLine(sql);
+                    }
+                },
+                LogLevel.Information,
+                DbContextLoggerOptions.Id
+            ).EnableSensitiveDataLogging();
+        }
+    }
+);
+
+builder.Services.AddScoped<IRepository<User>, SqlUserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddControllers();
+
+var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.MapControllers();
+app.Run();

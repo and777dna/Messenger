@@ -10,9 +10,9 @@ public class UserController(IUserService userService) : ControllerBase
 {
     private readonly CancellationTokenSource _tokenSource = new();
     [HttpPost]
-    public IActionResult RegisterUser(User user)
+    public async Task<IActionResult> RegisterUser(User user)
     {
-        userService.AddUserAsync(user, _tokenSource.Token);
+        await userService.AddUserAsync(user, _tokenSource.Token);
         return Ok();
     }
 }
