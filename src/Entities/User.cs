@@ -5,11 +5,11 @@ namespace Messenger.Entities;
 public class User
 {
     [Required]
-    public Guid Id{get; private set;}
-    public string? Name { get; private set; }
-    public string? Email { get; private set; }
+    public Guid Id{get;} = Guid.NewGuid();
+    public string? Name { get; set; }
+    public string? Email { get; set;}
     [Required]
-    public DateOnly RegistrationDate { get; private set; }
+    public DateOnly RegistrationDate { get; set; }
     [Required]
-    public string? PasswordHash { get; private set; }
+    public string? PasswordHash { get; set; }
 }

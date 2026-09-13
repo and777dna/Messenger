@@ -1,8 +1,9 @@
+using Messenger.DTOs.Requests;
 using Messenger.Entities;
 
 namespace Messenger.Services.Interfaces;
 
 public interface IUserService
 {
-    public Task AddUserAsync(User user, CancellationToken ct = default);
+    public Task AddUserAsync(RequestUserDto requestUserDto, CancellationToken ct = default);
 }

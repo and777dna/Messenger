@@ -1,14 +1,17 @@
+using Messenger.DTOs.Requests;
 using Messenger.Entities;
 using Messenger.Repositories.Interfaces;
 using Messenger.Services.Interfaces;
+using Messenger.Services.MapperDto.Interfaces;
 
 namespace Messenger.Services.Implementations;
 
-public class UserService(IRepository<User> userRepository) : IUserService
+public class UserService(IRepository<User> userRepository, IMapper<User, RequestUserDto> mapper) : IUserService
 {
-    public async Task AddUserAsync(User user, CancellationToken ct)
+    public async Task AddUserAsync(RequestUserDto requestUserDto, CancellationToken ct)
     { 
-        if (user == null) throw new ArgumentNullException(nameof(user), "User is required");
+        if (requestUserDto == null) throw new ArgumentNullException(nameof(requestUserDto), "requestUserDto is required");
+        var user = mapper.ToEntity(requestUserDto);
        await userRepository.AddAsync(user, ct);
     }
 }

@@ -1,3 +1,4 @@
+using Messenger.DTOs.Requests;
 using Messenger.Entities;
 using Messenger.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +11,9 @@ public class UserController(IUserService userService) : ControllerBase
 {
     private readonly CancellationTokenSource _tokenSource = new();
     [HttpPost]
-    public async Task<IActionResult> RegisterUser(User user)
+    public async Task<IActionResult> RegisterUser(RequestUserDto requestUserDto)
     {
-        await userService.AddUserAsync(user, _tokenSource.Token);
+        await userService.AddUserAsync(requestUserDto, _tokenSource.Token);
         return Ok();
     }
 }
