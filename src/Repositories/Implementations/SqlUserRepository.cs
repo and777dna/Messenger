@@ -19,18 +19,19 @@ public class SqlUserRepository(MessengerDbContext messengerDbContext) : IReposit
         return user;   
     }
 
-    public Task AddAsync(User entity, CancellationToken ct = default)
+    public async Task AddAsync(User user, CancellationToken ct = default)
+    {
+        await messengerDbContext.Users.AddAsync(user);
+    }
+
+    public Task UpdateAsync(User user, CancellationToken ct = default)
     {
         throw new NotImplementedException();
     }
 
-    public Task UpdateAsync(User entity, CancellationToken ct = default)
+    public async Task DeleteAsync(User user, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task DeleteAsync(User entity, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
+        var findUser = await GetByIdAsync(user.Id, ct);
+        if(findUser != null)messengerDbContext.Users.Remove(findUser);
     }
 }
