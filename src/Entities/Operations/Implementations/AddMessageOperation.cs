@@ -2,10 +2,10 @@ using Messenger.Entities.Operations.Interfaces;
 
 namespace Messenger.Entities.Operations.Implementations;
 
-public class AddMessageOperation : IOperation<Chat>
+public class AddMessageOperation(Message message) : IOperation<Chat>
 {
-    public void Operation(Guid messageId)
+    public void Apply(Chat chat)
     {
-        
+        chat.AddMessage(message);
     }
-}//TODO: this one shouldnt be inside Message.cs
+}

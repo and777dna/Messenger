@@ -2,13 +2,13 @@ namespace Messenger.Entities;
 
 public class Chat
 {
-    public Guid Id{ get; }
-    public bool IsPrivate { get; }
-    public IEnumerable<User> Members { get; }
-    public IEnumerable<Message> Messages { get; }
+    public Guid Id { get; private set; } = Guid.NewGuid();
+    public bool IsPrivate { get; private set; }
+    public ICollection<User> Members { get; private set; } = new List<User>();
+    public ICollection<Message> Messages { get; private set; } = new List<Message>();
 
     public void AddMessage(Message message)
     {
-        Messages.Append(message);
+        //Messages.Append(message);////TODO: to decide whether to implement this for DI
     }
 }

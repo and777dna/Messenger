@@ -12,4 +12,7 @@ public class User
     public DateOnly RegistrationDate { get; set; }
     [Required]
     public string? PasswordHash { get; set; }
+    
+    public ICollection<Chat> Chats { get; private set; } = new List<Chat>();
+    public ICollection<Message> Messages { get; private set; } = new List<Message>();
 }

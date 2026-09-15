@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var connectionString = builder.Configuration.GetConnectionString("MessengerDatabase");
+var connectionString = builder.Configuration.GetConnectionString("FulfilmentCenterDatabase");
 builder.Services.AddDbContext<MessengerDbContext>(options =>
     {
         options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
@@ -46,8 +46,11 @@ builder.Services.AddDbContext<MessengerDbContext>(options =>
     }
 );
 
+builder.Services.AddScoped<IRepository<Chat>, SqlChatRepository>();
+builder.Services.AddScoped<IRepository<Message>, SqlMessageRepository>();
 builder.Services.AddScoped<IRepository<User>, SqlUserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 
 builder.Services.AddControllers();
 
