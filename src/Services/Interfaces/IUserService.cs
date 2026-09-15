@@ -1,5 +1,4 @@
 using Messenger.DTOs.Requests;
-using Messenger.Entities;
 
 namespace Messenger.Services.Interfaces;
 

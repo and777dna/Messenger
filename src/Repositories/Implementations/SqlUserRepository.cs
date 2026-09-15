@@ -15,7 +15,7 @@ public class SqlUserRepository(MessengerDbContext messengerDbContext) : IReposit
 
     public async Task<User?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
-        var user = await messengerDbContext.Users.FirstAsync(user => user.Id == id);
+        var user = await messengerDbContext.Users.FirstOrDefaultAsync(user => user.Id == id);
         return user;   
     }
 

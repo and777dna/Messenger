@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Messenger.DTOs.Requests;
 
-public record RequestUserDto()
+public record RequestUserDto
 {
     [Required] public string? Name { get; }
     [Required] public string? Email { get; }

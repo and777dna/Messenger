@@ -9,7 +9,7 @@ namespace Messenger.Services.Implementations;
 public class UserService(IRepository<User> userRepository, IMapper<User, RequestUserDto> mapper) : IUserService
 {
     public async Task AddUserAsync(RequestUserDto requestUserDto, CancellationToken ct)
-    { 
+    {
         if (requestUserDto == null) throw new ArgumentNullException(nameof(requestUserDto), "requestUserDto is required");
         var user = mapper.ToEntity(requestUserDto);
        await userRepository.AddAsync(user, ct);

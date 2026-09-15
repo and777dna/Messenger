@@ -1,0 +1,35 @@
+using Messenger.Data;
+using Messenger.Entities;
+using Messenger.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
+namespace Messenger.Repositories.Implementations;
+
+public class SqlChatRepository(MessengerDbContext messengerDbContext): IRepository<Chat>
+{
+    public async Task<IEnumerable<Chat>> GetAllAsync(CancellationToken ct = default)
+    {
+        return await messengerDbContext.Chats.ToListAsync();
+    }
+
+    public async Task<Chat?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        var chat = await messengerDbContext.Chats.FirstOrDefaultAsync(chat => chat.Id == id);
+        return chat; 
+    }
+
+    public async Task AddAsync(Chat entity, CancellationToken ct = default)
+    {
+        await messengerDbContext.Chats.AddAsync(entity);
+    }
+
+    public Task UpdateAsync(Chat entity, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteAsync(Chat entity, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+}
