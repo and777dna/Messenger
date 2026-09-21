@@ -1,8 +1,8 @@
 using Messenger.DTOs.Requests;
 using Messenger.Entities;
-using Messenger.Services.MapperDto.Interfaces;
+using Messenger.MapperDto.Interfaces;
 
-namespace Messenger.Services.MapperDto.Implementations;
+namespace Messenger.MapperDto.Implementations;
 
 public class MessageMapper : IMapper<Message, RequestMessageDto>
 {
@@ -14,5 +14,10 @@ public class MessageMapper : IMapper<Message, RequestMessageDto>
             SenderId = dto.SenderId,
             Content = dto.Content
         };
+    }
+
+    public RequestMessageDto ToDto(Message entity)
+    {
+        throw new NotImplementedException();
     }
 }

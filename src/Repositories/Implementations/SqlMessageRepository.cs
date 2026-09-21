@@ -12,7 +12,7 @@ public class SqlMessageRepository(MessengerDbContext messengerDbContext) : IRepo
         return await messengerDbContext.Messages.ToListAsync();
     }
 
-    public Task<Message?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public Task<Message?> GetByIdAsync(Guid id, int page, int pageSize, CancellationToken ct = default)
     {
         throw new NotImplementedException();
     }

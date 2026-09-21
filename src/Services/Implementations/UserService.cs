@@ -1,8 +1,8 @@
 using Messenger.DTOs.Requests;
 using Messenger.Entities;
+using Messenger.MapperDto.Interfaces;
 using Messenger.Repositories.Interfaces;
 using Messenger.Services.Interfaces;
-using Messenger.Services.MapperDto.Interfaces;
 
 namespace Messenger.Services.Implementations;
 

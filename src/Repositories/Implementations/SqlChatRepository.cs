@@ -12,9 +12,9 @@ public class SqlChatRepository(MessengerDbContext messengerDbContext): IReposito
         return await messengerDbContext.Chats.ToListAsync();
     }
 
-    public async Task<Chat?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<Chat?> GetByIdAsync(Guid id, int page, int pageSize, CancellationToken ct = default)
     {
-        var chat = await messengerDbContext.Chats.FirstOrDefaultAsync(chat => chat.Id == id);
+        var chat = await messengerDbContext.Chats.Skip((page - 1)*pageSize).Take(pageSize).FirstOrDefaultAsync(chat => chat.Id == id);
         return chat; 
     }
 

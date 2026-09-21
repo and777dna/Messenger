@@ -1,8 +1,8 @@
 using Messenger.DTOs.Requests;
 using Messenger.Entities;
-using Messenger.Services.MapperDto.Interfaces;
+using Messenger.MapperDto.Interfaces;
 
-namespace Messenger.Services.MapperDto.Implementations;
+namespace Messenger.MapperDto.Implementations;
 
 public class UserMapper : IMapper<User, RequestUserDto> 
 {
@@ -15,5 +15,10 @@ public class UserMapper : IMapper<User, RequestUserDto>
             RegistrationDate = dto.RegistrationDate,
             PasswordHash = dto.PasswordHash
         };
+    }
+
+    public RequestUserDto ToDto(User entity)
+    {
+        throw new NotImplementedException();
     }
 }

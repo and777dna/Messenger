@@ -8,6 +8,7 @@ using Messenger.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -52,11 +53,23 @@ builder.Services.AddScoped<IRepository<User>, SqlUserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 
+//builder.Services.AddSingleton<IDistributedCache, RedisCache>();
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "SampleInstance";
+});
+
+//builder.Services.AddSignalR();
+
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+//app.MapHub<ChatHub>("/Chat");
 
 app.MapControllers();
 app.Run();
