@@ -48,9 +48,9 @@ builder.Services.AddDbContext<MessengerDbContext>(options =>
     }
 );
 
-builder.Services.AddScoped<IRepository<Chat>, SqlChatRepository>();
-builder.Services.AddScoped<IMessageRepository, SqlMessageRepository>();
-builder.Services.AddScoped<IRepository<User>, SqlUserRepository>();
+builder.Services.AddScoped<IRepository<Chat>, ChatRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IRepository<User>, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 

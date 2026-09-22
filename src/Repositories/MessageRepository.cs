@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.Repositories;
 
-public class SqlMessageRepository(MessengerDbContext messengerDbContext) : IMessageRepository
+public class MessageRepository(MessengerDbContext messengerDbContext) : IMessageRepository
 {
     public Task<Message?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         messengerDbContext.Messages.FirstOrDefaultAsync(m => m.Id == id);

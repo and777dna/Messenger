@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.Repositories;
 
-public class SqlUserRepository(MessengerDbContext messengerDbContext) : IRepository<User>
+public class UserRepository(MessengerDbContext messengerDbContext) : IRepository<User>
 {
     public async Task<IEnumerable<User>> GetAllAsync(CancellationToken ct = default)
     {
