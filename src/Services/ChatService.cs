@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Messenger.Caching;
 using Messenger.DTOs.Requests;
 using Messenger.DTOs.Responses;
@@ -7,19 +8,23 @@ using Messenger.Repositories.Interfaces;
 using Messenger.Services.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace Messenger.Services.Implementations;
+namespace Messenger.Services;
 
-public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,IMapper<Chat, ResponseChatDto> mapperChat, IMessageRepository messageRepository, IRepository<Chat> chatRepository, IDistributedCache cache) : IChatService
+public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages, 
+    IMapper<Chat, ResponseChatDto> mapperChat, IMessageRepository messageRepository, 
+    IRepository<Chat> chatRepository, IDistributedCache cache, IChatNotifier notifier) : IChatService
 {
-    
     public async Task SendMessageAsync(RequestMessageDto requestMessageDto, CancellationToken ct = default)
     {
+        var cacheKey = CacheKeys.ChatMessages(requestMessageDto.ChatId);
         var message = mapperMessages.ToEntity(requestMessageDto);
         //requestMessageDto.Operation = new AddMessageOperation(message);//TODO: to decide whether to implement this for DI
+        await cache.RefreshAsync(cacheKey);
         await messageRepository.AddAsync(message);
+        await notifier.MessagePostedAsync(requestMessageDto);
     }
 
-    public async Task<string> GetMessagesAsync(Guid chatId, int limit, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Message>> GetMessagesAsync(Guid chatId, int limit, CancellationToken ct = default)
     {
         var cacheKey = CacheKeys.ChatMessages(chatId);
         var cachedData = await cache.GetStringAsync(cacheKey);
@@ -32,30 +37,9 @@ public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,IMap
                 SlidingExpiration = TimeSpan.FromMinutes(10)
             };
             
-            await cache.SetStringAsync(cacheKey, messages, options);
+            await cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(messages), options);
             return messages;
         }
-        return cachedData;
+        return JsonSerializer.Deserialize<List<Message>>(cachedData);
     }
-    
-    /*public async Task<string> GetDataAsync(string key) {
-           var cachedData = await _cache.GetStringAsync(key);
-
-           if (cachedData == null) {
-
-               // Fetch the data from source.
-               var data = await FetchDataFromSource();
-
-               // Cache the data with options.
-               var options = new DistributedCacheEntryOptions {
-                  AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30),
-                  SlidingExpiration = TimeSpan.FromMinutes(5)
-               };
-
-               await _cache.SetStringAsync(key, data, options);
-               return data;
-           }
-
-           return cachedData;
-       }*/
 }

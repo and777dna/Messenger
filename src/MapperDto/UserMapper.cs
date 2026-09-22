@@ -2,7 +2,7 @@ using Messenger.DTOs.Requests;
 using Messenger.Entities;
 using Messenger.MapperDto.Interfaces;
 
-namespace Messenger.MapperDto.Implementations;
+namespace Messenger.MapperDto;
 
 public class UserMapper : IMapper<User, RequestUserDto> 
 {

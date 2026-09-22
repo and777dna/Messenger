@@ -2,7 +2,7 @@ using Messenger.DTOs.Responses;
 using Messenger.Entities;
 using Messenger.MapperDto.Interfaces;
 
-namespace Messenger.MapperDto.Implementations;
+namespace Messenger.MapperDto;
 
 public class ChatMapper : IMapper<Chat, ResponseChatDto>
 {

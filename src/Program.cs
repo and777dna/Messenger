@@ -1,9 +1,10 @@
 using Messenger.Data;
 using Messenger.Entities;
+using Messenger.Hubs;
 using Messenger.Middleware;
-using Messenger.Repositories.Implementations;
+using Messenger.Repositories;
 using Messenger.Repositories.Interfaces;
-using Messenger.Services.Implementations;
+using Messenger.Services;
 using Messenger.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -53,14 +54,14 @@ builder.Services.AddScoped<IRepository<User>, SqlUserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 
-//builder.Services.AddSingleton<IDistributedCache, RedisCache>();
+builder.Services.AddSingleton<IChatNotifier, SignalRChatNotifier>();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
     options.InstanceName = "SampleInstance";
 });
 
-//builder.Services.AddSignalR();
+builder.Services.AddSignalR();
 
 
 builder.Services.AddControllers();
@@ -69,7 +70,7 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-//app.MapHub<ChatHub>("/Chat");
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.MapControllers();
 app.Run();

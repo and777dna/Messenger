@@ -4,7 +4,7 @@ using Messenger.MapperDto.Interfaces;
 using Messenger.Repositories.Interfaces;
 using Messenger.Services.Interfaces;
 
-namespace Messenger.Services.Implementations;
+namespace Messenger.Services;
 
 public class UserService(IRepository<User> userRepository, IMapper<User, RequestUserDto> mapper) : IUserService
 {

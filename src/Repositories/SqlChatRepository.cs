@@ -3,7 +3,7 @@ using Messenger.Entities;
 using Messenger.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Messenger.Repositories.Implementations;
+namespace Messenger.Repositories;
 
 public class SqlChatRepository(MessengerDbContext messengerDbContext): IRepository<Chat>
 {
