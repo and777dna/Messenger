@@ -13,11 +13,6 @@ public class ChatMapper : IMapper<Chat, ResponseChatDto>
 
     public ResponseChatDto ToDto(Chat chat)
     {
-        return new ResponseChatDto
-        {
-            IsPrivate = chat.IsPrivate,
-            Members = chat.Members,
-            Messages = chat.Messages
-        };
+        throw new NotImplementedException();
     }
 }

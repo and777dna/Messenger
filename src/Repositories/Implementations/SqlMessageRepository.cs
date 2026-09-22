@@ -5,29 +5,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Messenger.Repositories.Implementations;
 
-public class SqlMessageRepository(MessengerDbContext messengerDbContext) : IRepository<Message>
+public class SqlMessageRepository(MessengerDbContext messengerDbContext) : IMessageRepository
 {
-    public async Task<IEnumerable<Message>> GetAllAsync(CancellationToken ct = default)
+    public Task<Message?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
+        messengerDbContext.Messages.FirstOrDefaultAsync(m => m.Id == id);
+
+    public async Task<IReadOnlyList<Message>> GetLatestAsync(Guid chatId,int limit = 50, DateOnly? before = null, CancellationToken ct = default)
     {
-        return await messengerDbContext.Messages.ToListAsync();
+        var query = messengerDbContext.Messages.Where(m => m.ChatId == chatId);
+        if (before != null)
+        {
+            query = query.Where(m => m.SendDate < before);
+        }
+
+        return await query.OrderByDescending(m => m.SendDate).Take(50).ToListAsync();
     }
 
-    public Task<Message?> GetByIdAsync(Guid id, int page, int pageSize, CancellationToken ct = default)
+    public Task AddAsync(Message message)
     {
         throw new NotImplementedException();
     }
 
-    public async Task AddAsync(Message entity, CancellationToken ct = default)
-    {
-        await messengerDbContext.Messages.AddAsync(entity);
-    }
-
-    public Task UpdateAsync(Message entity, CancellationToken ct = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task DeleteAsync(Message entity, CancellationToken ct = default)
+    public void Remove(Message message)
     {
         throw new NotImplementedException();
     }

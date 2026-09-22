@@ -1,3 +1,4 @@
+using Messenger.Caching;
 using Messenger.DTOs.Requests;
 using Messenger.DTOs.Responses;
 using Messenger.Entities;
@@ -8,8 +9,9 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Messenger.Services.Implementations;
 
-public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,IMapper<Chat, ResponseChatDto> mapperChat, IRepository<Message> messageRepository, IRepository<Chat> chatRepository, IDistributedCache cache) : IChatService
+public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,IMapper<Chat, ResponseChatDto> mapperChat, IMessageRepository messageRepository, IRepository<Chat> chatRepository, IDistributedCache cache) : IChatService
 {
+    
     public async Task SendMessageAsync(RequestMessageDto requestMessageDto, CancellationToken ct = default)
     {
         var message = mapperMessages.ToEntity(requestMessageDto);
@@ -17,11 +19,23 @@ public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,IMap
         await messageRepository.AddAsync(message);
     }
 
-    public async Task<ResponseChatDto> GetMessagesAsync(Guid chatId, int page, int pageSize, CancellationToken ct = default)
+    public async Task<string> GetMessagesAsync(Guid chatId, int limit, CancellationToken ct = default)
     {
-        var messages = await chatRepository.GetByIdAsync(chatId, page, pageSize);
-        var chatToDto = mapperChat.ToDto(messages);
-        return chatToDto;
+        var cacheKey = CacheKeys.ChatMessages(chatId);
+        var cachedData = await cache.GetStringAsync(cacheKey);
+        if (cachedData == null)
+        {
+            var messages = await messageRepository.GetLatestAsync(chatId, limit);
+            
+            var options = new DistributedCacheEntryOptions {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1),
+                SlidingExpiration = TimeSpan.FromMinutes(10)
+            };
+            
+            await cache.SetStringAsync(cacheKey, messages, options);
+            return messages;
+        }
+        return cachedData;
     }
     
     /*public async Task<string> GetDataAsync(string key) {
