@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Messenger.DTOs.Requests;
 using Messenger.Entities.Operations;
 using Messenger.Services.Interfaces;
@@ -11,7 +12,8 @@ public class ChatController(IChatService chatService) : ControllerBase
 {
     private readonly CancellationTokenSource _tokenSource = new();
     [HttpPost("messages")]
-    public async Task<IActionResult> AddMessage(RequestMessageDto requestMessageDto)
+    public async Task<IActionResult> AddMessage(RequestMessageDto requestMessageDto, 
+        [FromHeader(Name = "Idempotency-Key"), Required] Guid? idempotencyKey)
     {
         await chatService.SendMessageAsync(requestMessageDto, _tokenSource.Token);
         return Ok();
