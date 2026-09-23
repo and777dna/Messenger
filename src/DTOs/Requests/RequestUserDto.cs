@@ -4,9 +4,8 @@ namespace Messenger.DTOs.Requests;
 
 public record RequestUserDto
 {
-    [Required] public string? Name { get; }
-    [Required] public string? Email { get; }
+    public required string Name { get; init; }
+    public string? Email { get; init; }
     [Required] public DateOnly RegistrationDate { get; } = DateOnly.FromDateTime(DateTime.UtcNow);
-    [Required]
-    public string? PasswordHash { get; }
-};
+    public required string PasswordHash { get; init; }
+}
