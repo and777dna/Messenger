@@ -8,11 +8,10 @@ namespace Messenger.Controllers;
 [Route("api/user")]
 public class UserController(IUserService userService) : ControllerBase
 {
-    private readonly CancellationTokenSource _tokenSource = new();
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterUser(RequestUserDto requestUserDto)
+    public async Task<IActionResult> RegisterUser(RequestUserDto requestUserDto, CancellationToken cancellationToken)
     {
-        await userService.AddUserAsync(requestUserDto, _tokenSource.Token);
+        await userService.AddUserAsync(requestUserDto, cancellationToken);
         return Ok();
     }
 }

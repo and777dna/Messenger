@@ -9,19 +9,19 @@ public class UserRepository(MessengerDbContext messengerDbContext) : IRepository
 {
     public async Task<IEnumerable<User>> GetAllAsync(CancellationToken ct = default)
     {
-        var users = await messengerDbContext.Users.ToListAsync();
+        var users = await messengerDbContext.Users.ToListAsync(ct);
         return users;    
     }
 
     public async Task<User?> GetByIdAsync(Guid id, int page = 1, int pageSize = 50, CancellationToken ct = default)
     {
-        var user = await messengerDbContext.Users.FirstOrDefaultAsync(user => user.Id == id);
+        var user = await messengerDbContext.Users.FirstOrDefaultAsync(user => user.Id == id, ct);
         return user;   
     }
 
     public async Task AddAsync(User user, CancellationToken ct = default)
     {
-        await messengerDbContext.Users.AddAsync(user);
+        await messengerDbContext.Users.AddAsync(user, ct);
     }
 
     public Task UpdateAsync(User user, CancellationToken ct = default)
@@ -31,7 +31,7 @@ public class UserRepository(MessengerDbContext messengerDbContext) : IRepository
 
     public async Task DeleteAsync(User user, CancellationToken ct = default)
     {
-        var findUser = await GetByIdAsync(user.Id);
+        var findUser = await GetByIdAsync(user.Id,1,50, ct);
         if(findUser != null)messengerDbContext.Users.Remove(findUser);
     }
 }

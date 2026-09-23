@@ -8,11 +8,10 @@ namespace Messenger.Controllers;
 [Route("api/chats")]
 public class ChatController(IChatService chatService) : ControllerBase
 {
-    private readonly CancellationTokenSource _tokenSource = new();
     [HttpPost("messages")]
-    public async Task<IActionResult> AddMessage(RequestMessageDto requestMessageDto)
+    public async Task<IActionResult> AddMessage(RequestMessageDto requestMessageDto, CancellationToken cancellationToken)
     {
-        await chatService.SendMessageAsync(requestMessageDto, _tokenSource.Token);
+        await chatService.SendMessageAsync(requestMessageDto, cancellationToken);
         return Ok();
     }
 }

@@ -8,7 +8,7 @@ namespace Messenger.Repositories;
 public class MessageRepository(MessengerDbContext messengerDbContext) : IMessageRepository
 {
     public Task<Message?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
-        messengerDbContext.Messages.FirstOrDefaultAsync(m => m.Id == id);
+        messengerDbContext.Messages.FirstOrDefaultAsync(m => m.Id == id, ct);
 
     public async Task<IReadOnlyList<Message>> GetLatestAsync(Guid chatId,int limit = 50, DateOnly? before = null, CancellationToken ct = default)
     {
@@ -18,15 +18,15 @@ public class MessageRepository(MessengerDbContext messengerDbContext) : IMessage
             query = query.Where(m => m.SendDate < before);
         }
 
-        return await query.OrderByDescending(m => m.SendDate).Take(50).ToListAsync();
+        return await query.OrderByDescending(m => m.SendDate).Take(50).ToListAsync(ct);
     }
 
-    public Task AddAsync(Message message)
+    public async Task AddAsync(Message message, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        await messengerDbContext.Messages.AddAsync(message, ct);
     }
 
-    public void Remove(Message message)
+    public void Remove(Message message, CancellationToken ct = default)
     {
         throw new NotImplementedException();
     }
