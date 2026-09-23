@@ -1,3 +1,4 @@
+using Messenger.DTOs.Requests;
 using Messenger.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,8 @@ public class MessengerDbContext : DbContext
             new { Id = Chat1 },
             new { Id = Chat2 }
         );
+
+        modelBuilder.Entity<IdempotencyRecord>().HasKey(x => new {x.Key});
 
         modelBuilder.Entity<Chat>().HasMany(u => u.Members).WithMany(chat => chat.Chats);
         modelBuilder.Entity<Chat>().HasMany(m => m.Messages).WithOne(chat => chat.Chat);

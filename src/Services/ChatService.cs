@@ -14,7 +14,7 @@ public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,
     IMapper<Chat, ResponseChatDto> mapperChat, IMessageRepository messageRepository, 
     IRepository<Chat> chatRepository, IDistributedCache cache, IChatNotifier notifier) : IChatService
 {
-    public async Task SendMessageAsync(RequestMessageDto requestMessageDto, CancellationToken ct = default)
+    public async Task SendMessageAsync(RequestMessageDto requestMessageDto, CancellationToken ct)
     {
         var cacheKey = CacheKeys.ChatMessages(requestMessageDto.ChatId);
         var message = mapperMessages.ToEntity(requestMessageDto);
@@ -24,7 +24,7 @@ public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,
         await notifier.MessagePostedAsync(requestMessageDto);
     }
 
-    public async Task<IReadOnlyList<Message>> GetMessagesAsync(Guid chatId, int limit, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Message>> GetMessagesAsync(Guid chatId, int limit, CancellationToken ct)
     {
         var cacheKey = CacheKeys.ChatMessages(chatId);
         var cachedData = await cache.GetStringAsync(cacheKey);
@@ -40,6 +40,12 @@ public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,
             await cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(messages), options);
             return messages;
         }
-        return JsonSerializer.Deserialize<List<Message>>(cachedData);
+
+        var messagesDeserialize = JsonSerializer.Deserialize<List<Message>>(cachedData);
+        if (messagesDeserialize == null)
+        {
+            throw new InvalidOperationException();
+        }
+        return messagesDeserialize;
     }
 }
