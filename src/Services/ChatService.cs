@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Messenger.Caching;
 using Messenger.DTOs.Requests;
-using Messenger.DTOs.Responses;
 using Messenger.Entities;
 using Messenger.MapperDto.Interfaces;
 using Messenger.Repositories.Interfaces;
@@ -11,8 +10,7 @@ using Microsoft.Extensions.Caching.Distributed;
 namespace Messenger.Services;
 
 public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages, 
-    IMapper<Chat, ResponseChatDto> mapperChat, IMessageRepository messageRepository, 
-    IRepository<Chat> chatRepository, IDistributedCache cache, IChatNotifier notifier) : IChatService
+    IMessageRepository messageRepository, IDistributedCache cache, IChatNotifier notifier) : IChatService
 {
     public async Task SendMessageAsync(RequestMessageDto requestMessageDto, CancellationToken ct)
     {
