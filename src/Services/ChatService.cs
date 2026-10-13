@@ -17,25 +17,25 @@ public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,
         var cacheKey = CacheKeys.ChatMessages(requestMessageDto.ChatId);
         var message = mapperMessages.ToEntity(requestMessageDto);
         //requestMessageDto.Operation = new AddMessageOperation(message);//TODO: to decide whether to implement this for DI
-        await cache.RefreshAsync(cacheKey);
-        await messageRepository.AddAsync(message);
+        await cache.RefreshAsync(cacheKey, ct);
+        await messageRepository.AddAsync(message, ct);
         await notifier.MessagePostedAsync(requestMessageDto);
     }
 
     public async Task<IReadOnlyList<Message>> GetMessagesAsync(Guid chatId, int limit, CancellationToken ct)
     {
         var cacheKey = CacheKeys.ChatMessages(chatId);
-        var cachedData = await cache.GetStringAsync(cacheKey);
+        var cachedData = await cache.GetStringAsync(cacheKey, ct);
         if (cachedData == null)
         {
-            var messages = await messageRepository.GetLatestAsync(chatId, limit);
+            var messages = await messageRepository.GetLatestAsync(chatId, limit, ct: ct);
             
             var options = new DistributedCacheEntryOptions {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1),
                 SlidingExpiration = TimeSpan.FromMinutes(10)
             };
             
-            await cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(messages), options);
+            await cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(messages), options, ct);
             return messages;
         }
 
