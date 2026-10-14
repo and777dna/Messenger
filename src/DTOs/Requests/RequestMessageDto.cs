@@ -9,4 +9,5 @@ public record RequestMessageDto
     public Guid ChatId{ get; init; }
     public Guid SenderId { get; init; }
     public required string Content { get; init; }
+    public Guid? IdempotencyKey { get; set; }
 };

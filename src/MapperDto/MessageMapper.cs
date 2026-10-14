@@ -15,7 +15,8 @@ public class MessageMapper : IMapper<Message, RequestMessageDto>
         {
             ChatId = chatId,
             SenderId = senderId,
-            Content = dto.Content
+            Content = dto.Content,
+            IdempotencyKey = dto.IdempotencyKey
         };
     }
 

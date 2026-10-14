@@ -4,7 +4,6 @@ public class Chat
 {
     public Guid Id { get; private init; } = Guid.NewGuid();
     public bool IsPrivate { get; private set; }
-    public Guid IdempotencyKey { get; set; }
     public ICollection<User> Members { get; private set; } = new List<User>();
     public ICollection<Message> Messages { get; private set; } = new List<Message>();
 

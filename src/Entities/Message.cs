@@ -3,6 +3,7 @@ namespace Messenger.Entities;
 public class Message
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
+    public Guid? IdempotencyKey { get; set; }
     public DateOnly SendDate { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow);
     public bool IsRead { get; private set; }
     public string? Content { get; set; }

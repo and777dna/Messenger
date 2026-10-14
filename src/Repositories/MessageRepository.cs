@@ -23,7 +23,12 @@ public class MessageRepository(MessengerDbContext messengerDbContext) : IMessage
 
     public async Task AddAsync(Message message, CancellationToken ct = default)
     {
-        await messengerDbContext.Messages.AddAsync(message, ct);
+        var messageIdempotency =
+            await messengerDbContext.Messages.FirstOrDefaultAsync(o => o.IdempotencyKey == message.IdempotencyKey, ct);
+        if (messageIdempotency == null)
+        {
+            await messengerDbContext.Messages.AddAsync(message, ct);
+        }
     }
 
     public void Remove(Message message, CancellationToken ct = default)

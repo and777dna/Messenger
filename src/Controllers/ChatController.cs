@@ -13,6 +13,8 @@ public class ChatController(IChatService chatService) : ControllerBase
     public async Task<IActionResult> AddMessage(RequestMessageDto requestMessageDto,
         [FromHeader(Name = "Idempotency-Key"), Required] Guid? idempotencyKey, CancellationToken cancellationToken)
     {
+        if (idempotencyKey == Guid.Empty)throw new ArgumentException("Idempotency key cannot be empty.", nameof(idempotencyKey));
+        requestMessageDto.IdempotencyKey = idempotencyKey;
         await chatService.SendMessageAsync(requestMessageDto, cancellationToken);
         return Ok();
     }
