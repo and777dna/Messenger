@@ -1,6 +1,9 @@
 using Messenger.Data;
+using Messenger.DTOs.Requests;
 using Messenger.Entities;
 using Messenger.Hubs;
+using Messenger.MapperDto;
+using Messenger.MapperDto.Interfaces;
 using Messenger.Middleware;
 using Messenger.Repositories;
 using Messenger.Repositories.Interfaces;
@@ -54,6 +57,9 @@ builder.Services.AddScoped<IRepository<User>, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 
+builder.Services.AddSingleton<IMapper<Message, RequestMessageDto>, MessageMapper>();
+builder.Services.AddSingleton<IMapper<User, RequestUserDto>, UserMapper>();
+
 builder.Services.AddSingleton<IChatNotifier, SignalRChatNotifier>();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -69,6 +75,7 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseStaticFiles();
 
 app.MapHub<ChatHub>("/hubs/chat");
 

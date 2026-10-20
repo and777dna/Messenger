@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace Messenger.Middleware;
 
-public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger logger)
+public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
 {
     public async Task Invoke(HttpContext httpContext)
     {
