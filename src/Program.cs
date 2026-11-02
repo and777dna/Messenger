@@ -77,6 +77,9 @@ var app = builder.Build();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseStaticFiles();
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.MapHub<ChatHub>("/hubs/chat");
 
 app.MapControllers();
