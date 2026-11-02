@@ -62,4 +62,17 @@ public class ChatServiceTests
         _mapper.Verify(m => m.ToEntity(dto), Times.Once);
         _messageRepository.Verify(r => r.AddAsync(message, It.IsAny<CancellationToken>()), Times.Once);
     }
+    
+    [Fact]
+    public async Task SendMessageAsync_RefreshesCacheForChat()
+    {
+        var dto = CreateDto();
+        var message = CreateMessage(dto);
+        SetupHappyPath(dto, message);
+
+        await _sut.SendMessageAsync(dto, CancellationToken.None);
+
+        var cacheKey = $"chat:{dto.ChatId}:messages";
+        _cache.Verify(c => c.RefreshAsync(cacheKey, It.IsAny<CancellationToken>()), Times.Once);
+    }
 }
