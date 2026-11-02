@@ -64,7 +64,7 @@ public class ChatServiceTests
     }
     
     [Fact]
-    public async Task SendMessageAsync_RefreshesCacheForChat()
+    public async Task SendMessageAsync_ValidDto_AddsMessageToRepositoryOnce()
     {
         var dto = CreateDto();
         var message = CreateMessage(dto);
@@ -74,5 +74,18 @@ public class ChatServiceTests
 
         var cacheKey = $"chat:{dto.ChatId}:messages";
         _cache.Verify(c => c.RefreshAsync(cacheKey, It.IsAny<CancellationToken>()), Times.Once);
+    }
+    
+    [Fact]
+    public async Task SendMessageAsync_ValidDto_NotifiesClientsWithSameDto()
+    {
+        var dto = CreateDto();
+        var message = CreateMessage(dto);
+        SetupHappyPath(dto, message);
+
+        await _sut.SendMessageAsync(dto, CancellationToken.None);
+
+        _notifier.Verify(n => n.MessagePostedAsync(It.Is<RequestMessageDto>(d 
+            => ReferenceEquals(d, dto))), Times.Once);
     }
 }
