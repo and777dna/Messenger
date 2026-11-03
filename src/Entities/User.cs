@@ -5,7 +5,7 @@ namespace Messenger.Entities;
 public class User
 {
     [Required]
-    public Guid Id{get;} = Guid.NewGuid();
+    public Guid Id { get; private set; } = Guid.NewGuid();
     public string? Name { get; set; }
     public string? Email { get; set;}
     [Required]

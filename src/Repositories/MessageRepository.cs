@@ -28,6 +28,7 @@ public class MessageRepository(MessengerDbContext messengerDbContext) : IMessage
         if (messageIdempotency == null)
         {
             await messengerDbContext.Messages.AddAsync(message, ct);
+            await messengerDbContext.SaveChangesAsync(ct);//TODO: most probably to 
         }
     }
 
