@@ -45,7 +45,7 @@ public class ChatServiceTests
         _cache.Setup(c => c.RefreshAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
         _messageRepository.Setup(r => r.AddAsync(It.IsAny<Message>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
         _notifier.Setup(n => n.MessagePostedAsync(It.IsAny<RequestMessageDto>()))
             .Returns(Task.CompletedTask);
     }

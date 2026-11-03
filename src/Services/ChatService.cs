@@ -17,9 +17,13 @@ public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,
         var cacheKey = CacheKeys.ChatMessages(requestMessageDto.ChatId);
         var message = mapperMessages.ToEntity(requestMessageDto);
         //requestMessageDto.Operation = new AddMessageOperation(message);//TODO: to decide whether to implement this for DI
+        var added = await messageRepository.AddAsync(message, ct);
+        if (!added)
+        {
+            return;
+        }
         await cache.RefreshAsync(cacheKey, ct);
         await notifier.MessagePostedAsync(requestMessageDto);
-        await messageRepository.AddAsync(message, ct);
     }
 
     public async Task<IReadOnlyList<Message>> GetMessagesAsync(Guid chatId, int limit, CancellationToken ct)

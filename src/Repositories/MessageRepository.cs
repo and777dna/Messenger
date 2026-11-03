@@ -21,7 +21,7 @@ public class MessageRepository(MessengerDbContext messengerDbContext) : IMessage
         return await query.OrderByDescending(m => m.SendDate).Take(50).ToListAsync(ct);
     }
 
-    public async Task AddAsync(Message message, CancellationToken ct = default)
+    public async Task<bool> AddAsync(Message message, CancellationToken ct)
     {
         var messageIdempotency =
             await messengerDbContext.Messages.FirstOrDefaultAsync(o => o.IdempotencyKey == message.IdempotencyKey, ct);
@@ -29,7 +29,10 @@ public class MessageRepository(MessengerDbContext messengerDbContext) : IMessage
         {
             await messengerDbContext.Messages.AddAsync(message, ct);
             await messengerDbContext.SaveChangesAsync(ct);//TODO: most probably to 
+            return true;
         }
+
+        return false;
     }
 
     public void Remove(Message message, CancellationToken ct = default)
