@@ -1,5 +1,6 @@
 using Messenger.Data;
 using Messenger.DTOs.Requests;
+using Messenger.DTOs.Responses;
 using Messenger.Entities;
 using Messenger.Hubs;
 using Messenger.MapperDto;
@@ -65,6 +66,7 @@ builder.Services.AddScoped<IChatService, ChatService>();
 
 builder.Services.AddSingleton<IMapper<Message, RequestMessageDto>, MessageMapper>();
 builder.Services.AddSingleton<IMapper<User, RequestUserDto>, UserMapper>();
+builder.Services.AddSingleton<IResponseMapper<Message, ResponseMessageDto>, ResponseMessageMapper>();
 
 builder.Services.AddSingleton<IChatNotifier, SignalRChatNotifier>();
 builder.Services.AddStackExchangeRedisCache(options =>

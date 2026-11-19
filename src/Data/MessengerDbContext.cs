@@ -38,7 +38,7 @@ public class MessengerDbContext(DbContextOptions<MessengerDbContext> options) : 
                 ChatId = Chat1,
                 SenderId = User1,
                 Content = "Hello!",
-                SendDate = new DateOnly(2026, 1, 1),
+                SentAt = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
                 IsRead = true
             },
             new
@@ -47,7 +47,7 @@ public class MessengerDbContext(DbContextOptions<MessengerDbContext> options) : 
                 ChatId = Chat1,
                 SenderId = User1,
                 Content = "How are you?",
-                SendDate = new DateOnly(2026, 1, 2),
+                SentAt = new DateTimeOffset(2026, 1, 2, 0, 0, 0, TimeSpan.Zero),
                 IsRead = true
             },
             new
@@ -56,7 +56,7 @@ public class MessengerDbContext(DbContextOptions<MessengerDbContext> options) : 
                 ChatId = Chat1,
                 SenderId = User1,
                 Content = "This is the latest seeded message.",
-                SendDate = new DateOnly(2026, 1, 3),
+                SentAt = new DateTimeOffset(2026, 1, 3, 0, 0, 0, TimeSpan.Zero),
                 IsRead = false
             }
         );
@@ -66,6 +66,6 @@ public class MessengerDbContext(DbContextOptions<MessengerDbContext> options) : 
         modelBuilder.Entity<Chat>().HasMany(u => u.Members).WithMany(chat => chat.Chats);
         modelBuilder.Entity<Chat>().HasMany(m => m.Messages).WithOne(chat => chat.Chat);
         
-        modelBuilder.Entity<Message>().HasIndex(c => new{c.Id, c.SendDate});
+        modelBuilder.Entity<Message>().HasIndex(m => new { m.ChatId, m.SentAt });
     }
 }

@@ -10,15 +10,15 @@ public class MessageRepository(MessengerDbContext messengerDbContext) : IMessage
     public Task<Message?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
         messengerDbContext.Messages.FirstOrDefaultAsync(m => m.Id == id, ct);
 
-    public async Task<IReadOnlyList<Message>> GetLatestAsync(Guid chatId,int limit = 50, DateOnly? before = null, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Message>> GetLatestAsync(Guid chatId, int limit = 50, DateTimeOffset? before = null, CancellationToken ct = default)
     {
         var query = messengerDbContext.Messages.Where(m => m.ChatId == chatId);
         if (before != null)
         {
-            query = query.Where(m => m.SendDate < before);
+            query = query.Where(m => m.SentAt < before);
         }
 
-        return await query.OrderByDescending(m => m.SendDate).Take(50).ToListAsync(ct);
+        return await query.OrderByDescending(m => m.SentAt).Take(limit).ToListAsync(ct);
     }
 
     public async Task<bool> AddAsync(Message message, CancellationToken ct)
