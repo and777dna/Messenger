@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><title>SignalR demo</title></head>
+<body>
+<input id="text" placeholder="Сообщение">
+<button id="send">Отправить</button>
+<ul id="log"></ul>
+
+<script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
+<script>
+    const chatId = "8f14e45f-ceea-467a-9a3e-7b3c1c2d0001"; // Chat1 из HasData
+    const senderId = crypto.randomUUID();                  // у каждой вкладки свой
+
+    const log = text => {
+        const li = document.createElement("li");
+        li.textContent = text;
+        document.getElementById("log").append(li);
+    };
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/hubs/chat")
+        .withAutomaticReconnect()
+        .build();
+
+    // сервер → клиент
+    connection.on("ReceiveMessage", m => log(`${m.senderId.slice(0, 8)}: ${m.content}`));
+    connection.onreconnected(() => connection.invoke("JoinChat", chatId));
+
+    // клиент → сервер
+    document.getElementById("send").onclick = () =>
+        connection.invoke("SendMessage", {
+            chatId,
+            senderId,
+            content: document.getElementById("text").value
+        }).catch(e => log("Ошибка: " + e.message));
+
+    connection.start()
+        .then(() => connection.invoke("JoinChat", chatId))
+        .then(() => log("Подключено, ConnectionId: " + connection.connectionId))
+        .catch(e => log("Ошибка: " + e.message));
+</script>
+</body>
+</html>

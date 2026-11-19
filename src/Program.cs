@@ -1,0 +1,97 @@
+using Messenger.Data;
+using Messenger.DTOs.Requests;
+using Messenger.DTOs.Responses;
+using Messenger.Entities;
+using Messenger.Hubs;
+using Messenger.MapperDto;
+using Messenger.MapperDto.Interfaces;
+using Messenger.Middleware;
+using Messenger.Repositories;
+using Messenger.Repositories.Interfaces;
+using Messenger.Services;
+using Messenger.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Serilog;
+
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSerilog((services, loggerConfiguration) => loggerConfiguration
+    .ReadFrom.Configuration(builder.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext());
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var connectionString = builder.Configuration.GetConnectionString("FulfilmentCenterDatabase");
+builder.Services.AddDbContext<MessengerDbContext>(options =>
+    {
+        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+
+        if (builder.Environment.IsDevelopment())
+        {
+            options.LogTo(
+                msg =>
+                {
+                    var lines = msg.Split(Environment.NewLine);
+
+                    var sqlLines = lines
+                        .SkipWhile(l =>
+                            !l.TrimStart().StartsWith("SELECT", StringComparison.OrdinalIgnoreCase) &&
+                            !l.TrimStart().StartsWith("INSERT", StringComparison.OrdinalIgnoreCase) &&
+                            !l.TrimStart().StartsWith("UPDATE", StringComparison.OrdinalIgnoreCase) &&
+                            !l.TrimStart().StartsWith("DELETE", StringComparison.OrdinalIgnoreCase));
+
+                    var sql = string.Join(Environment.NewLine, sqlLines);
+
+                    if (!string.IsNullOrWhiteSpace(sql))
+                    {
+                        Console.WriteLine(sql);
+                    }
+                },
+                LogLevel.Information,
+                DbContextLoggerOptions.Id
+            ).EnableSensitiveDataLogging();
+        }
+    }
+);
+
+builder.Services.AddScoped<IRepository<Chat>, ChatRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IRepository<User>, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IChatService, ChatService>();
+
+builder.Services.AddSingleton<IMapper<Message, RequestMessageDto>, MessageMapper>();
+builder.Services.AddSingleton<IMapper<User, RequestUserDto>, UserMapper>();
+builder.Services.AddSingleton<IResponseMapper<Message, ResponseMessageDto>, ResponseMessageMapper>();
+
+builder.Services.AddSingleton<IChatNotifier, SignalRChatNotifier>();
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "SampleInstance";
+});
+
+builder.Services.AddSignalR();
+
+
+builder.Services.AddControllers();
+
+var app = builder.Build();
+
+// First in the pipeline: one log line per request with its final status code.
+// Exceptions are logged once, by ExceptionHandlingMiddleware.
+app.UseSerilogRequestLogging();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseStaticFiles();
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.MapHub<ChatHub>("/hubs/chat");
+
+app.MapControllers();
+app.Run();

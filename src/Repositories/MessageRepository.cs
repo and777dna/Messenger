@@ -1,0 +1,42 @@
+using Messenger.Data;
+using Messenger.Entities;
+using Messenger.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
+namespace Messenger.Repositories;
+
+public class MessageRepository(MessengerDbContext messengerDbContext) : IMessageRepository
+{
+    public Task<Message?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
+        messengerDbContext.Messages.FirstOrDefaultAsync(m => m.Id == id, ct);
+
+    public async Task<IReadOnlyList<Message>> GetLatestAsync(Guid chatId, int limit = 50, DateTimeOffset? before = null, CancellationToken ct = default)
+    {
+        var query = messengerDbContext.Messages.Where(m => m.ChatId == chatId);
+        if (before != null)
+        {
+            query = query.Where(m => m.SentAt < before);
+        }
+
+        return await query.OrderByDescending(m => m.SentAt).Take(limit).ToListAsync(ct);
+    }
+
+    public async Task<bool> AddAsync(Message message, CancellationToken ct)
+    {
+        var messageIdempotency =
+            await messengerDbContext.Messages.FirstOrDefaultAsync(o => o.IdempotencyKey == message.IdempotencyKey, ct);
+        if (messageIdempotency == null)
+        {
+            await messengerDbContext.Messages.AddAsync(message, ct);
+            await messengerDbContext.SaveChangesAsync(ct);//TODO: most probably to 
+            return true;
+        }
+
+        return false;
+    }
+
+    public void Remove(Message message, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
+}

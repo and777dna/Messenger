@@ -2,8 +2,18 @@ namespace Messenger.Entities;
 
 public class Message
 {
-    public Guid Id{get; private set;}
-    public DateOnly RegistrationDate { get; private set; }
+    public Guid Id { get; private set; } = Guid.NewGuid();
+    public Guid? IdempotencyKey { get; set; }
+    public DateTimeOffset SentAt { get; private set; } = DateTimeOffset.UtcNow;
     public bool IsRead { get; private set; }
-    public string? Content { get; private set; }
+    public string? Content { get; set; }
+    
+    public Guid ChatId{ get; set; }
+    public Chat Chat { get; }
+    public Guid SenderId{ get; set; }
+    public User Sender { get; }
+    public void MakeRead()
+    {
+        this.IsRead = true;
+    }
 }
