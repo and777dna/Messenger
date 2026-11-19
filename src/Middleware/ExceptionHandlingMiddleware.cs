@@ -12,6 +12,9 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
         }
         catch (Exception e)
         {
+            logger.LogError(e, "Unhandled exception while processing {Method} {Path}",
+                httpContext.Request.Method, httpContext.Request.Path);
+
             httpContext.Response.ContentType = "application/json";
             httpContext.Response.StatusCode = 500;
             var message = "internal server error";
@@ -20,7 +23,6 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
                 message,
                 statusCode = 500
             }));
-            logger.Log(LogLevel.Error, message);
         }
     }
     

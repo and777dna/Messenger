@@ -11,9 +11,15 @@ using Messenger.Services;
 using Messenger.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Serilog;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSerilog((services, loggerConfiguration) => loggerConfiguration
+    .ReadFrom.Configuration(builder.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext());
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -74,6 +80,9 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
+// First in the pipeline: one log line per request with its final status code.
+// Exceptions are logged once, by ExceptionHandlingMiddleware.
+app.UseSerilogRequestLogging();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseStaticFiles();
 

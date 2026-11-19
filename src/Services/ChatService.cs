@@ -9,8 +9,9 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace Messenger.Services;
 
-public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages, 
-    IMessageRepository messageRepository, IDistributedCache cache, IChatNotifier notifier) : IChatService
+public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,
+    IMessageRepository messageRepository, IDistributedCache cache, IChatNotifier notifier,
+    ILogger<ChatService> logger) : IChatService
 {
     public async Task SendMessageAsync(RequestMessageDto requestMessageDto, CancellationToken ct)
     {
@@ -20,8 +21,15 @@ public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,
         var added = await messageRepository.AddAsync(message, ct);
         if (!added)
         {
+            logger.LogInformation(
+                "Duplicate message for chat {ChatId} ignored, idempotency key {IdempotencyKey} was already used",
+                requestMessageDto.ChatId, requestMessageDto.IdempotencyKey);
             return;
         }
+
+        logger.LogInformation("Message {MessageId} saved to chat {ChatId} by sender {SenderId}",
+            message.Id, requestMessageDto.ChatId, requestMessageDto.SenderId);
+
         await cache.RefreshAsync(cacheKey, ct);
         await notifier.MessagePostedAsync(requestMessageDto);
     }
@@ -32,6 +40,7 @@ public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,
         var cachedData = await cache.GetStringAsync(cacheKey, ct);
         if (cachedData == null)
         {
+            logger.LogDebug("Cache miss for chat {ChatId}, loading messages from database", chatId);
             var messages = await messageRepository.GetLatestAsync(chatId, limit, ct: ct);
             
             var options = new DistributedCacheEntryOptions {
@@ -43,10 +52,11 @@ public class ChatService(IMapper<Message, RequestMessageDto> mapperMessages,
             return messages;
         }
 
+        logger.LogDebug("Cache hit for chat {ChatId}", chatId);
         var messagesDeserialize = JsonSerializer.Deserialize<List<Message>>(cachedData);
         if (messagesDeserialize == null)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException($"Cached messages for chat {chatId} could not be deserialized.");
         }
         return messagesDeserialize;
     }
