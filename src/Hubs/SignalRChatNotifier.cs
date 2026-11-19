@@ -4,8 +4,14 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Messenger.Hubs;
 
-public class SignalRChatNotifier(IHubContext<ChatHub, IChatClient<RequestMessageDto>> hub) : IChatNotifier
+public class SignalRChatNotifier(
+    IHubContext<ChatHub, IChatClient<RequestMessageDto>> hub,
+    ILogger<SignalRChatNotifier> logger) : IChatNotifier
 {
     public Task MessagePostedAsync(RequestMessageDto message)
-        => hub.Clients.Group($"room:{message.ChatId}").ReceiveMessage(message);
+    {
+        var group = $"room:{message.ChatId}";
+        logger.LogDebug("Sending message for chat {ChatId} to SignalR group {Group}", message.ChatId, group);
+        return hub.Clients.Group(group).ReceiveMessage(message);
+    }
 }

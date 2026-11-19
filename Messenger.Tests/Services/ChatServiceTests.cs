@@ -6,6 +6,7 @@ using Messenger.Repositories.Interfaces;
 using Messenger.Services;
 using Messenger.Services.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Messenger.Tests.Services;
@@ -20,7 +21,8 @@ public class ChatServiceTests
 
     public ChatServiceTests()
     {
-        _sut = new ChatService(_mapper.Object, _messageRepository.Object, _cache.Object, _notifier.Object);
+        _sut = new ChatService(_mapper.Object, _messageRepository.Object, _cache.Object, _notifier.Object,
+            NullLogger<ChatService>.Instance);
     }
 
     private static RequestMessageDto CreateDto() => new()
